@@ -62,6 +62,7 @@ interface BookingContextType {
   getBookingsByUser: (userId: string) => Booking[]
   getRoomOccupancy: (roomId: string, date: string) => boolean
   getAllBookings: () => Booking[]
+  getBookingsByDateRange: (start: string, end: string) => Booking[]
   createBooking: (bookingData: Omit<Booking, "id" | "createdAt" | "updatedAt">) => Promise<boolean>
   getRoomById: (id: string) => Room | undefined
   checkRoomAvailability: (roomId: string, checkIn: string, checkOut: string) => boolean
@@ -299,6 +300,16 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     return bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }
 
+  const getBookingsByDateRange = (start: string, end: string): Booking[] => {
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    return bookings.filter(
+      (booking) =>
+        new Date(booking.checkIn) >= startDate &&
+        new Date(booking.checkOut) <= endDate
+    )
+  }
+
   const getRoomById = (id: string): Room | undefined => {
     return rooms.find((room) => room.id === id)
   }
@@ -337,6 +348,7 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     getBookingsByUser,
     getRoomOccupancy,
     getAllBookings,
+    getBookingsByDateRange,
     createBooking,
     getRoomById,
     checkRoomAvailability,
